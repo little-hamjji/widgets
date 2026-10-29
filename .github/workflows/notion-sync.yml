@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "17 * * * *"   # 매시 17분(UTC) 자동 실행
   workflow_dispatch:        # Actions 탭에서 「Run workflow」로 바로 실행
+  push:                     # 동기화 설정을 올리면 바로 한 번 실행
+    branches: [main]
+    paths:
+      - ".github/workflows/notion-sync.yml"
+      - "scripts/**"
 
 permissions:
   contents: write
