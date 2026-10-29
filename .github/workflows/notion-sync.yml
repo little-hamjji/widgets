@@ -1,0 +1,34 @@
+name: 노션 차트 데이터 동기화
+
+on:
+  schedule:
+    - cron: "17 * * * *"   # 매시 17분(UTC) 자동 실행
+  workflow_dispatch:        # Actions 탭에서 「Run workflow」로 바로 실행
+
+permissions:
+  contents: write
+
+concurrency:
+  group: notion-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: 노션에서 건수 읽기
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          DATA_KEY: ${{ secrets.DATA_KEY }}
+        run: node scripts/notion-sync.mjs
+      - name: 바뀐 경우에만 저장
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --cached --quiet -- data.json || git commit -m "노션 데이터 자동 갱신"
+          git push
