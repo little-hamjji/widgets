@@ -1048,6 +1048,7 @@ let CAT=lsGet("ws:cat")||"all";
 function drawTabs(){$("#tabs").replaceChildren(...CATS.map(([k,n])=>{const cnt=k==="all"?W.length:W.filter(w=>w.cats.includes(k)).length;
   return h("button",{class:"tab","aria-pressed":String(CAT===k),onclick:()=>{CAT=k;lsSet("ws:cat",k);drawTabs();applyView()}},`${n} ${cnt}`)}))}
 function applyView(){const m=/^#w-([a-z]+)$/.exec(location.hash);const solo=m&&W.find(w=>w.key===m[1]);
+  if(m&&!solo){document.body.classList.add("solo");for(const w of W)w.card.hidden=true;return}
   document.body.classList.toggle("solo",!!solo);
   for(const w of W)w.card.hidden=solo?w!==solo:!(CAT==="all"||w.cats.includes(CAT));
   if(solo)window.scrollTo(0,0);}
